@@ -3,376 +3,1771 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Bibliography</title>
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+  <link
+    rel="stylesheet"
+    href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"
+  />
+
   <style>
+    :root {
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-soft: #f9fafb;
+      --border: #e5e7eb;
+      --border-strong: #d1d5db;
+      --text: #111827;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --danger: #dc2626;
+      --radius: 10px;
+      --shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
     body {
-      font-family: system-ui, sans-serif;
-      padding: 2rem;
-      background: #fafafa;
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
     }
 
-    .toolbar {
-      margin-bottom: 1rem;
+    body {
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    /* ------------------------------------------------------------
+       APP SHELL
+    ------------------------------------------------------------ */
+
+    .app {
+      min-height: 100vh;
+    }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      max-width: 1600px;
+      margin: auto;
+      padding: 18px 24px;
+    }
+
+    .header-top {
       display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
       align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 16px;
     }
 
-    details.menu {
-      display: inline-block;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 0.35rem 0.6rem;
-    }
-
-    details.menu summary {
-      cursor: pointer;
-      user-select: none;
-      font-weight: 600;
-    }
-
-    .menu-content {
-      margin-top: 0.65rem;
-      display: grid;
-      gap: 0.4rem;
-      min-width: 260px;
-    }
-
-    .field-list {
-      max-height: 220px;
-      overflow-y: auto;
-      border: 1px solid #eee;
-      border-radius: 5px;
-      padding: 0.5rem;
-      background: #fafafa;
-    }
-
-    .field-list label {
-      display: block;
-      margin-bottom: 0.35rem;
-    }
-
-    .menu-buttons {
+    .brand {
       display: flex;
-      gap: 0.5rem;
+      align-items: center;
+      gap: 12px;
     }
 
-    .secondary-btn {
-      border: 1px solid #d0d0d0;
-      background: #fff;
-      border-radius: 5px;
-      padding: 0.35rem 0.6rem;
-      cursor: pointer;
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--accent);
+      color: white;
+      font-size: 18px;
     }
 
-    .secondary-btn:hover {
-      background: #f4f4f4;
+    .brand-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -.02em;
     }
 
-    table.dataTable {
-      width: 100% !important;
+    .brand-subtitle {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
     }
 
-    .dataTables_wrapper {
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ------------------------------------------------------------
+       BUTTONS
+    ------------------------------------------------------------ */
+
+    .btn {
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: .15s ease;
+    }
+
+    .btn:hover {
+      background: var(--surface-soft);
+      border-color: #b8bec8;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+
+    .btn-quiet {
+      border-color: transparent;
+      background: transparent;
+    }
+
+    .btn-quiet:hover {
+      background: var(--surface-soft);
+    }
+
+    /* ------------------------------------------------------------
+       SEARCH
+    ------------------------------------------------------------ */
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-box input {
       width: 100%;
+      height: 42px;
+      padding: 0 42px;
+      border: 1px solid var(--border-strong);
+      border-radius: 9px;
+      outline: none;
+      background: white;
+      color: var(--text);
     }
 
-    .dataTables_wrapper .dataTables_scroll {
+    .search-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .clear-search {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      display: none;
+    }
+
+    /* ------------------------------------------------------------
+       FILTER CHIPS
+    ------------------------------------------------------------ */
+
+    .filter-row {
+      max-width: 1600px;
+      margin: auto;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 48px;
       overflow-x: auto;
     }
 
-    #bibTable th,
-    #bibTable td {
-      max-width: 25vw;
+    .filter-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
       white-space: nowrap;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 9px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: white;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .chip button {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 0;
+      line-height: 1;
+    }
+
+    /* ------------------------------------------------------------
+       CONTENT
+    ------------------------------------------------------------ */
+
+    .content {
+      max-width: 1600px;
+      margin: auto;
+      padding: 20px 24px 50px;
+    }
+
+    .table-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       overflow: hidden;
-      text-overflow: ellipsis;
     }
 
-    #bibTable th.goto-column,
-    #bibTable td.goto-column {
-      min-width: 3rem;
-      max-width: 3rem;
-      width: 3rem;
-    }
-
-    .goto-btn {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: background-color 0.2s ease;
-    }
-
-    .goto-btn:hover {
-      background-color: #45a049;
-    }
-
-    .goto-btn:disabled {
-      background-color: #b5b5b5;
-      cursor: not-allowed;
+    .table-header {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
     }
 
     .table-container {
-      max-height: 75vh;
+      max-height: calc(100vh - 250px);
       overflow: auto;
+    }
+
+    /* ------------------------------------------------------------
+       DATATABLE OVERRIDES
+    ------------------------------------------------------------ */
+
+    #bibTable {
+      width: 100% !important;
+      border-collapse: collapse;
+    }
+
+    #bibTable thead th {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: #f9fafb;
+      border-bottom: 1px solid var(--border);
+      color: #4b5563;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      font-weight: 700;
+      padding: 11px 14px;
+    }
+
+    #bibTable tbody td {
+      padding: 13px 14px;
+      border-bottom: 1px solid #f0f1f3;
+      vertical-align: top;
+      font-size: 13px;
+      max-width: 360px;
+    }
+
+    #bibTable tbody tr:hover {
+      background: #fafcff;
+    }
+
+    #bibTable tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .title-cell {
+      font-weight: 600;
+      color: #1f2937;
+      white-space: normal !important;
+      line-height: 1.4;
+    }
+
+    .author-cell {
+      color: #4b5563;
+      white-space: normal !important;
+      line-height: 1.4;
+    }
+
+    .keyword-cell {
+      white-space: normal !important;
+    }
+
+    .keyword {
+      display: inline-block;
+      margin: 2px 3px 2px 0;
+      padding: 3px 7px;
+      border-radius: 5px;
+      background: #f3f4f6;
+      color: #4b5563;
+      font-size: 11px;
+    }
+
+    .doi-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: white;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .doi-btn:hover {
+      background: var(--accent-soft);
+      border-color: #bfdbfe;
+    }
+
+    .doi-disabled {
+      color: #c7cbd1;
+      cursor: default;
+    }
+
+    /* Remove default DataTables controls */
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+      display: none;
+    }
+
+    /* ------------------------------------------------------------
+       DRAWER
+    ------------------------------------------------------------ */
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,.3);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+    }
+
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(390px, 92vw);
+      height: 100vh;
+      background: white;
+      z-index: 201;
+      transform: translateX(100%);
+      transition: transform .22s ease;
+      box-shadow: -10px 0 30px rgba(0,0,0,.12);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .drawer-title {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .drawer-body {
+      padding: 18px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .drawer-footer {
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .filter-section {
+      margin-bottom: 24px;
+    }
+
+    .filter-section h3 {
+      margin: 0 0 9px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--muted);
+    }
+
+    .filter-section select,
+    .filter-section input[type="text"],
+    .filter-section input[type="number"] {
       width: 100%;
+      border: 1px solid var(--border-strong);
+      border-radius: 7px;
+      padding: 9px 10px;
+      background: white;
+      outline: none;
+    }
+
+    .year-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .field-search {
+      margin-bottom: 8px;
+    }
+
+    .field-list {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+    }
+
+    .field-list label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .field-list label:hover {
+      background: var(--surface-soft);
+    }
+
+    /* ------------------------------------------------------------
+       MOBILE
+    ------------------------------------------------------------ */
+
+    @media (max-width: 800px) {
+      .header-inner,
+      .content,
+      .filter-row {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .header-top {
+        align-items: flex-start;
+      }
+
+      .brand-subtitle {
+        display: none;
+      }
+
+      .header-actions .label {
+        display: none;
+      }
+
+      .search-row {
+        display: block;
+      }
+
+      .search-row .btn {
+        margin-top: 8px;
+        width: 100%;
+      }
+
+      .table-container {
+        max-height: none;
+      }
+
+      #bibTable thead {
+        display: none;
+      }
+
+      #bibTable,
+      #bibTable tbody,
+      #bibTable tr,
+      #bibTable td {
+        display: block;
+        width: 100% !important;
+      }
+
+      #bibTable tr {
+        padding: 14px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      #bibTable td {
+        border: 0;
+        padding: 3px 0;
+        max-width: none;
+      }
+
+      #bibTable td::before {
+        content: attr(data-label);
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 10px;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+
+      #bibTable td.goto-column {
+        position: absolute;
+        right: 14px;
+        width: auto !important;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div class="toolbar">
-    <details class="menu">
-      <summary>Columns</summary>
-      <div class="menu-content">
-        <div id="fieldMenu" class="field-list"></div>
-        <div class="menu-buttons">
-          <button id="resetColumnsBtn" class="secondary-btn" type="button">Reset to defaults</button>
+
+<div class="app">
+
+  <header class="app-header">
+    <div class="header-inner">
+
+      <div class="header-top">
+
+        <div class="brand">
+          <div class="brand-icon">▤</div>
+          <div>
+            <h1 class="brand-title">Bibliography</h1>
+            <div class="brand-subtitle">
+              <span id="referenceCount">Loading references…</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn" id="filtersBtn">☷ <span class="label">Filters</span></button>
+          <button class="btn" id="columnsBtn">▦ <span class="label">Columns</span></button>
+          <button class="btn btn-primary" id="downloadFullBibBtn">
+            ↓ <span class="label">Download .bib</span>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="search-row">
+
+        <div class="search-box">
+          <span class="search-icon">⌕</span>
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search authors, titles, keywords, DOI…"
+            autocomplete="off"
+          />
+          <button class="clear-search" id="clearSearch">×</button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="filter-row" id="activeFilters">
+      <span class="filter-label">Filters:</span>
+      <span id="noFilters">None</span>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <div class="table-card">
+
+      <div class="table-header">
+        <span id="resultSummary">Loading…</span>
+        <span>Click a DOI icon to open the source</span>
+      </div>
+
+      <div class="table-container">
+        <table id="bibTable">
+          <thead>
+            <tr id="tableHeadRow"></tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+
+<!-- Drawer backdrop -->
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+
+<!-- Filter / column drawer -->
+<aside class="drawer" id="drawer">
+
+  <div class="drawer-header">
+    <h2 class="drawer-title" id="drawerTitle">Filters</h2>
+    <button class="btn btn-quiet" id="closeDrawer">×</button>
+  </div>
+
+  <div class="drawer-body" id="drawerBody">
+
+    <!-- Filters -->
+    <div id="filterPanel">
+
+      <div class="filter-section">
+        <h3>Entry type</h3>
+        <select id="typeFilter">
+          <option value="">All types</option>
+        </select>
+      </div>
+
+      <div class="filter-section">
+        <h3>Publication year</h3>
+        <div class="year-row">
+          <input id="yearFrom" type="number" placeholder="From">
+          <input id="yearTo" type="number" placeholder="To">
         </div>
       </div>
-    </details>
-    <button id="downloadFullBibBtn" class="secondary-btn" type="button">Download full .bib</button>
+
+      <div class="filter-section">
+        <h3>DOI</h3>
+        <label class="checkbox-row">
+          <input id="doiOnly" type="checkbox">
+          Only show references with a DOI
+        </label>
+      </div>
+
+      <div class="filter-section">
+        <h3>Keywords</h3>
+        <input
+          id="keywordFilter"
+          type="text"
+          placeholder="e.g. virtual reality"
+        >
+      </div>
+
+    </div>
+
+    <!-- Columns -->
+    <div id="columnsPanel" style="display:none">
+
+      <div class="filter-section">
+        <h3>Visible columns</h3>
+
+        <input
+          class="field-search"
+          id="fieldSearch"
+          type="text"
+          placeholder="Find a field…"
+        >
+
+        <div class="field-list" id="fieldMenu"></div>
+
+      </div>
+
+    </div>
+
   </div>
 
-  <div class="table-container">
-    <table id="bibTable" class="display nowrap" style="width:100%">
-      <thead>
-        <tr id="tableHeadRow"></tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
+  <div class="drawer-footer">
+
+    <button class="btn" id="resetDrawerBtn">
+      Reset
+    </button>
+
+    <button class="btn btn-primary" id="closeDrawerBtn">
+      Done
+    </button>
+
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+</aside>
 
-  <script>
-    const FALLBACK_CONFIG = {
-      availableFields: ["type", "doi", "author", "title", "keywords", "year", "journal", "booktitle", "publisher", "volume", "number", "pages", "url"],
-      defaultFields: ["doi", "author", "title", "keywords"]
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+
+const FALLBACK_CONFIG = {
+  availableFields: [
+    "type",
+    "doi",
+    "author",
+    "title",
+    "keywords",
+    "year",
+    "journal",
+    "booktitle",
+    "publisher",
+    "volume",
+    "number",
+    "pages",
+    "url"
+  ],
+  defaultFields: [
+    "author",
+    "title",
+    "keywords",
+    "year"
+  ]
+};
+
+let bibEntries = [];
+let bibText = "";
+let viewerConfig = {...FALLBACK_CONFIG};
+let visibleFields = [...FALLBACK_CONFIG.defaultFields];
+let dataTableInstance = null;
+
+let filters = {
+  type: "",
+  yearFrom: "",
+  yearTo: "",
+  doiOnly: false,
+  keywords: ""
+};
+
+
+/* ============================================================
+   LOADING
+============================================================ */
+
+async function loadConfig() {
+
+  try {
+
+    const res = await fetch(
+      "viewer.config.json?t=" + Date.now()
+    );
+
+    if (!res.ok) throw new Error(res.statusText);
+
+    const config = await res.json();
+
+    const available =
+      uniqueLowercaseArray(config.availableFields);
+
+    let defaults =
+      uniqueLowercaseArray(config.defaultFields);
+
+    const safeAvailable =
+      available.length
+        ? available
+        : [...FALLBACK_CONFIG.availableFields];
+
+    defaults =
+      defaults.filter(f =>
+        safeAvailable.includes(f)
+      );
+
+    if (!defaults.length) {
+      defaults = [...FALLBACK_CONFIG.defaultFields];
+    }
+
+    return {
+      availableFields:
+        mergeUnique(safeAvailable, defaults),
+
+      defaultFields:
+        defaults
     };
 
-    let bibEntries = [];
-    let bibText = "";
-    let viewerConfig = { ...FALLBACK_CONFIG };
-    let visibleFields = [...FALLBACK_CONFIG.defaultFields];
-    let dataTableInstance = null;
+  } catch (err) {
 
-    async function loadConfig() {
-      try {
-        const res = await fetch('viewer.config.json?t=' + Date.now());
-        if (!res.ok) throw new Error(res.statusText);
+    console.warn(
+      "Could not load viewer.config.json.",
+      err
+    );
 
-        const config = await res.json();
-        const available = uniqueLowercaseArray(config.availableFields);
-        let defaults = uniqueLowercaseArray(config.defaultFields);
+    return {...FALLBACK_CONFIG};
+  }
+}
 
-        const safeAvailable = available.length ? available : [...FALLBACK_CONFIG.availableFields];
-        defaults = defaults.filter(f => safeAvailable.includes(f));
-        if (!defaults.length) defaults = [...FALLBACK_CONFIG.defaultFields];
 
-        return {
-          availableFields: mergeUnique(safeAvailable, defaults),
-          defaultFields: defaults
-        };
-      } catch (err) {
-        console.warn('Failed to load viewer.config.json, using fallback config.', err);
-        return { ...FALLBACK_CONFIG };
+async function loadBib() {
+
+  try {
+
+    viewerConfig = await loadConfig();
+
+    const res = await fetch("references.bib");
+
+    if (!res.ok) {
+      throw new Error(res.statusText);
+    }
+
+    bibText = await res.text();
+
+    bibEntries = parseBibTeX(bibText);
+
+    if (!bibEntries.length) {
+      document.getElementById("resultSummary").textContent =
+        "No bibliography entries found.";
+      return;
+    }
+
+    hydrateAvailableFields(bibEntries);
+
+    visibleFields =
+      [...viewerConfig.defaultFields];
+
+    buildFilters();
+    renderFieldMenu();
+    renderTable();
+
+    bindGlobalHandlers();
+
+  } catch (err) {
+
+    console.error(err);
+
+    document.getElementById("resultSummary").textContent =
+      "Error loading references.bib";
+  }
+}
+
+
+/* ============================================================
+   TABLE
+============================================================ */
+
+function renderTable() {
+
+  const headRow =
+    document.getElementById("tableHeadRow");
+
+  const body =
+    document.getElementById("tableBody");
+
+  if (
+    $.fn.DataTable.isDataTable("#bibTable") &&
+    dataTableInstance
+  ) {
+    dataTableInstance.destroy();
+  }
+
+  headRow.innerHTML = [
+    "<th class='goto-column'>DOI</th>",
+    ...visibleFields.map(
+      f => `<th>${formatFieldLabel(f)}</th>`
+    )
+  ].join("");
+
+  body.innerHTML = bibEntries
+    .map((entry, idx) => {
+
+      const doiUrl = getDoiUrl(entry);
+
+      const doiButton = doiUrl
+        ? `
+          <a
+            class="doi-btn"
+            href="${escapeHtml(doiUrl)}"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open DOI"
+          >↗</a>
+        `
+        : `
+          <span
+            class="doi-btn doi-disabled"
+            title="No DOI"
+          >—</span>
+        `;
+
+      return `
+        <tr>
+
+          <td
+            class="goto-column"
+            data-label="DOI"
+          >
+            ${doiButton}
+          </td>
+
+          ${
+            visibleFields
+              .map(field => {
+
+                const value =
+                  getFieldDisplayValue(
+                    entry,
+                    field
+                  );
+
+                let cls = "";
+
+                if (field === "title")
+                  cls = "title-cell";
+
+                if (field === "author")
+                  cls = "author-cell";
+
+                if (field === "keywords")
+                  cls = "keyword-cell";
+
+                return `
+                  <td
+                    class="${cls}"
+                    data-label="${formatFieldLabel(field)}"
+                  >
+                    ${formatFieldValue(field, value)}
+                  </td>
+                `;
+
+              })
+              .join("")
+          }
+
+        </tr>
+      `;
+
+    })
+    .join("");
+
+  dataTableInstance =
+    $("#bibTable").DataTable({
+
+      paging: false,
+      info: false,
+
+      searching: true,
+
+      ordering: true,
+
+      autoWidth: false,
+
+      scrollCollapse: true,
+
+      destroy: true
+
+    });
+
+  applyFilters();
+}
+
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+document
+  .getElementById("searchInput")
+  .addEventListener("input", function () {
+
+    const value = this.value;
+
+    document.getElementById("clearSearch").style.display =
+      value ? "block" : "none";
+
+    if (dataTableInstance) {
+      dataTableInstance.search(value).draw();
+    }
+
+    updateSummary();
+  });
+
+
+document
+  .getElementById("clearSearch")
+  .addEventListener("click", () => {
+
+    const input =
+      document.getElementById("searchInput");
+
+    input.value = "";
+
+    input.dispatchEvent(
+      new Event("input")
+    );
+  });
+
+
+/* ============================================================
+   FILTERS
+============================================================ */
+
+function buildFilters() {
+
+  const typeSelect =
+    document.getElementById("typeFilter");
+
+  const types =
+    [...new Set(
+      bibEntries
+        .map(e => e.type)
+        .filter(Boolean)
+    )]
+    .sort();
+
+  types.forEach(type => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = type.toLowerCase();
+    option.textContent = type;
+
+    typeSelect.appendChild(option);
+  });
+
+  [
+    "typeFilter",
+    "yearFrom",
+    "yearTo",
+    "doiOnly",
+    "keywordFilter"
+  ].forEach(id => {
+
+    document
+      .getElementById(id)
+      .addEventListener(
+        "input",
+        readFilters
+      );
+
+    document
+      .getElementById(id)
+      .addEventListener(
+        "change",
+        readFilters
+      );
+  });
+}
+
+
+function readFilters() {
+
+  filters.type =
+    document.getElementById("typeFilter").value;
+
+  filters.yearFrom =
+    document.getElementById("yearFrom").value;
+
+  filters.yearTo =
+    document.getElementById("yearTo").value;
+
+  filters.doiOnly =
+    document.getElementById("doiOnly").checked;
+
+  filters.keywords =
+    document
+      .getElementById("keywordFilter")
+      .value
+      .trim()
+      .toLowerCase();
+
+  applyFilters();
+}
+
+
+function applyFilters() {
+
+  if (!dataTableInstance) return;
+
+  $.fn.dataTable.ext.search =
+    $.fn.dataTable.ext.search.filter(
+      fn => !fn._bibliographyFilter
+    );
+
+  const filterFn = function(
+    settings,
+    data,
+    dataIndex
+  ) {
+
+    const entry =
+      bibEntries[dataIndex];
+
+    if (!entry) return true;
+
+    if (
+      filters.type &&
+      entry.type.toLowerCase() !== filters.type
+    ) {
+      return false;
+    }
+
+    const year =
+      parseInt(
+        getFieldDisplayValue(
+          entry,
+          "year"
+        )
+      );
+
+    if (
+      filters.yearFrom &&
+      (!year ||
+        year < Number(filters.yearFrom))
+    ) {
+      return false;
+    }
+
+    if (
+      filters.yearTo &&
+      (!year ||
+        year > Number(filters.yearTo))
+    ) {
+      return false;
+    }
+
+    if (
+      filters.doiOnly &&
+      !getDoiUrl(entry)
+    ) {
+      return false;
+    }
+
+    if (filters.keywords) {
+
+      const keywords =
+        getFieldDisplayValue(
+          entry,
+          "keywords"
+        ).toLowerCase();
+
+      if (!keywords.includes(filters.keywords)) {
+        return false;
       }
     }
 
-    async function loadBib() {
-      try {
-        viewerConfig = await loadConfig();
+    return true;
+  };
 
-        const res = await fetch('references.bib');
-        if (!res.ok) throw new Error(res.statusText);
-        bibText = await res.text();
+  filterFn._bibliographyFilter = true;
 
-        const entries = parseBibTeX(bibText);
-        bibEntries = entries;
-        if (!entries.length) {
-          document.body.innerHTML += "<p>No entries found in references.bib</p>";
-          return;
-        }
+  $.fn.dataTable.ext.search.push(filterFn);
 
-        hydrateAvailableFields(entries);
-        visibleFields = [...viewerConfig.defaultFields];
+  dataTableInstance.draw();
 
-        renderFieldMenu();
-        renderTable();
-        bindGlobalHandlers();
-      } catch (err) {
-        document.body.innerHTML += "<p>Error loading .bib file: " + err + "</p>";
+  renderActiveFilters();
+
+  updateSummary();
+}
+
+
+/* ============================================================
+   FILTER CHIPS
+============================================================ */
+
+function renderActiveFilters() {
+
+  const container =
+    document.getElementById("activeFilters");
+
+  container.innerHTML =
+    `<span class="filter-label">Filters:</span>`;
+
+  let count = 0;
+
+  function chip(label, callback) {
+
+    count++;
+
+    const element =
+      document.createElement("span");
+
+    element.className = "chip";
+
+    element.innerHTML =
+      `${escapeHtml(label)}
+       <button type="button">×</button>`;
+
+    element
+      .querySelector("button")
+      .onclick = callback;
+
+    container.appendChild(element);
+  }
+
+  if (filters.type) {
+
+    chip(
+      `Type: ${filters.type}`,
+      () => {
+        document.getElementById("typeFilter").value = "";
+        readFilters();
       }
-    }
+    );
+  }
 
-    function renderTable() {
-      const headRow = document.getElementById('tableHeadRow');
-      const body = document.getElementById('tableBody');
+  if (filters.yearFrom || filters.yearTo) {
 
-      // Destroy DataTable before replacing headers/cells so column updates apply right away.
-      if ($.fn.DataTable.isDataTable('#bibTable') && dataTableInstance) {
-        dataTableInstance.destroy();
+    chip(
+      `Year: ${filters.yearFrom || "…"}–${filters.yearTo || "…"}`,
+      () => {
+
+        document.getElementById("yearFrom").value = "";
+        document.getElementById("yearTo").value = "";
+
+        readFilters();
       }
+    );
+  }
 
-      headRow.innerHTML = [
-        '<th class="goto-column">Goto</th>',
-        ...visibleFields.map(f => `<th>${formatFieldLabel(f)}</th>`)
-      ].join('');
+  if (filters.doiOnly) {
 
-      body.innerHTML = bibEntries.map((entry, idx) => {
-        const doiUrl = getDoiUrl(entry);
-        const gotoButton = doiUrl
-          ? `<button class="goto-btn" data-idx="${idx}" title="Open DOI target">Goto</button>`
-          : '<button class="goto-btn" disabled title="No DOI found">Goto</button>';
+    chip(
+      "Has DOI",
+      () => {
+
+        document.getElementById("doiOnly").checked = false;
+
+        readFilters();
+      }
+    );
+  }
+
+  if (filters.keywords) {
+
+    chip(
+      `Keyword: ${filters.keywords}`,
+      () => {
+
+        document.getElementById("keywordFilter").value = "";
+
+        readFilters();
+      }
+    );
+  }
+
+  if (!count) {
+
+    const none =
+      document.createElement("span");
+
+    none.id = "noFilters";
+    none.textContent = "None";
+
+    container.appendChild(none);
+  }
+}
+
+
+/* ============================================================
+   COLUMNS
+============================================================ */
+
+function renderFieldMenu() {
+
+  const fieldMenu =
+    document.getElementById("fieldMenu");
+
+  fieldMenu.innerHTML =
+    viewerConfig.availableFields
+      .map(field => {
+
+        const checked =
+          visibleFields.includes(field)
+            ? "checked"
+            : "";
 
         return `
-          <tr>
-            <td class="goto-column">${gotoButton}</td>
-            ${visibleFields.map(f => `<td>${getFieldDisplayValue(entry, f)}</td>`).join("")}
-          </tr>
+          <label>
+            <input
+              type="checkbox"
+              value="${field}"
+              ${checked}
+            >
+            ${formatFieldLabel(field)}
+          </label>
         `;
-      }).join('');
 
-      dataTableInstance = $('#bibTable').DataTable({
-        paging: false,
-        info: false,
-        scrollY: '70vh',
-        scrollX: true,
-        scrollCollapse: true,
-        searching: true,
-        autoWidth: false,
-        destroy: true
-      });
+      })
+      .join("");
 
-      bindGotoHandlers();
-    }
+  fieldMenu
+    .querySelectorAll("input")
+    .forEach(input => {
 
-    function renderFieldMenu() {
-      const fieldMenu = document.getElementById('fieldMenu');
-      const resetBtn = document.getElementById('resetColumnsBtn');
+      input.addEventListener(
+        "change",
+        () => {
 
-      fieldMenu.innerHTML = viewerConfig.availableFields.map(field => {
-        const checked = visibleFields.includes(field) ? 'checked' : '';
-        return `<label><input type="checkbox" value="${field}" ${checked}> ${formatFieldLabel(field)}</label>`;
-      }).join('');
+          visibleFields =
+            Array.from(
+              fieldMenu.querySelectorAll(
+                "input:checked"
+              )
+            ).map(el => el.value);
 
-      fieldMenu.querySelectorAll('input[type="checkbox"]').forEach(input => {
-        input.addEventListener('change', () => {
-          visibleFields = Array.from(fieldMenu.querySelectorAll('input[type="checkbox"]:checked')).map(el => el.value);
           renderTable();
-        });
-      });
-
-      resetBtn.onclick = () => {
-        visibleFields = [...viewerConfig.defaultFields];
-        renderFieldMenu();
-        renderTable();
-      };
-    }
-
-    function bindGlobalHandlers() {
-      const fullBibBtn = document.getElementById('downloadFullBibBtn');
-      fullBibBtn.onclick = downloadFullBib;
-    }
-
-    function bindGotoHandlers() {
-      document.querySelectorAll('.goto-btn[data-idx]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const idx = Number(btn.getAttribute('data-idx'));
-          const url = getDoiUrl(bibEntries[idx]);
-          if (!url) return;
-          window.open(url, '_blank', 'noopener');
-        });
-      });
-    }
-
-    function getDoiUrl(entry) {
-      const rawDoi = findField(entry.fields || {}, 'doi').trim();
-      if (!rawDoi) return "";
-      if (/^https?:\/\//i.test(rawDoi)) return rawDoi;
-      return `https://doi.org/${rawDoi}`;
-    }
-
-    function getFieldDisplayValue(entry, fieldName) {
-      if (fieldName === 'type') {
-        return (entry.type || '').replace(/\s+/g, ' ');
-      }
-      return (findField(entry.fields || {}, fieldName) || '').replace(/\s+/g, ' ');
-    }
-
-    function downloadFullBib() {
-      if (!bibText) return;
-
-      const blob = new Blob([bibText], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'references.bib';
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function hydrateAvailableFields(entries) {
-      const discoveredFields = entries.flatMap(e => Object.keys(e.fields || {}));
-      viewerConfig.availableFields = mergeUnique(viewerConfig.availableFields, ['type', ...discoveredFields]);
-      viewerConfig.defaultFields = viewerConfig.defaultFields.filter(f => viewerConfig.availableFields.includes(f));
-      if (!viewerConfig.defaultFields.length) {
-        viewerConfig.defaultFields = [...viewerConfig.availableFields.slice(0, 4)];
-      }
-    }
-
-    function formatFieldLabel(fieldName) {
-      return fieldName
-        .replace(/[_\-]+/g, ' ')
-        .replace(/\b\w/g, c => c.toUpperCase());
-    }
-
-    function uniqueLowercaseArray(value) {
-      if (!Array.isArray(value)) return [];
-      const cleaned = value
-        .map(item => String(item).trim().toLowerCase())
-        .filter(Boolean);
-      return Array.from(new Set(cleaned));
-    }
-
-    function mergeUnique(primary, secondary) {
-      return Array.from(new Set([...(primary || []), ...(secondary || [])]));
-    }
-
-    function parseBibTeX(text) {
-      const entries = [];
-      const entryRegex = /@(\w+)\s*\{\s*([^,]+),([\s\S]*?)\n\}/g;
-      let match;
-      while ((match = entryRegex.exec(text)) !== null) {
-        const type = match[1].trim();
-        const key = match[2].trim();
-        const body = match[3];
-        const fields = {};
-        const fieldRegex = /([\w\-]+)\s*=\s*\{([\s\S]*?)\}/g;
-        let fmatch;
-        while ((fmatch = fieldRegex.exec(body)) !== null) {
-          fields[fmatch[1].trim().toLowerCase()] = fmatch[2].trim();
         }
-        entries.push({ type, key, fields });
-      }
-      return entries;
+      );
+
+    });
+}
+
+
+document
+  .getElementById("fieldSearch")
+  .addEventListener("input", function () {
+
+    const query =
+      this.value.toLowerCase();
+
+    document
+      .querySelectorAll("#fieldMenu label")
+      .forEach(label => {
+
+        label.style.display =
+          label.textContent
+            .toLowerCase()
+            .includes(query)
+            ? "flex"
+            : "none";
+
+      });
+  });
+
+
+/* ============================================================
+   DRAWER
+============================================================ */
+
+const drawer =
+  document.getElementById("drawer");
+
+const backdrop =
+  document.getElementById("drawerBackdrop");
+
+const drawerTitle =
+  document.getElementById("drawerTitle");
+
+function openDrawer(mode) {
+
+  drawerTitle.textContent =
+    mode === "columns"
+      ? "Visible columns"
+      : "Filters";
+
+  document.getElementById("filterPanel").style.display =
+    mode === "filters" ? "block" : "none";
+
+  document.getElementById("columnsPanel").style.display =
+    mode === "columns" ? "block" : "none";
+
+  drawer.classList.add("open");
+  backdrop.classList.add("open");
+}
+
+function closeDrawer() {
+
+  drawer.classList.remove("open");
+  backdrop.classList.remove("open");
+}
+
+document
+  .getElementById("filtersBtn")
+  .onclick = () => openDrawer("filters");
+
+document
+  .getElementById("columnsBtn")
+  .onclick = () => openDrawer("columns");
+
+document
+  .getElementById("closeDrawer")
+  .onclick = closeDrawer;
+
+document
+  .getElementById("closeDrawerBtn")
+  .onclick = closeDrawer;
+
+backdrop.onclick = closeDrawer;
+
+
+/* ============================================================
+   RESET
+============================================================ */
+
+document
+  .getElementById("resetDrawerBtn")
+  .onclick = () => {
+
+    document.getElementById("typeFilter").value = "";
+    document.getElementById("yearFrom").value = "";
+    document.getElementById("yearTo").value = "";
+    document.getElementById("doiOnly").checked = false;
+    document.getElementById("keywordFilter").value = "";
+
+    filters = {
+      type: "",
+      yearFrom: "",
+      yearTo: "",
+      doiOnly: false,
+      keywords: ""
+    };
+
+    visibleFields =
+      [...viewerConfig.defaultFields];
+
+    renderFieldMenu();
+    applyFilters();
+  };
+
+
+/* ============================================================
+   SUMMARY
+============================================================ */
+
+function updateSummary() {
+
+  if (!dataTableInstance) return;
+
+  const total =
+    bibEntries.length;
+
+  const visible =
+    dataTableInstance
+      .rows({search: "applied"})
+      .count();
+
+  document.getElementById(
+    "referenceCount"
+  ).textContent =
+    `${total} references`;
+
+  document.getElementById(
+    "resultSummary"
+  ).textContent =
+    `${visible} of ${total} references`;
+}
+
+
+/* ============================================================
+   DOWNLOAD
+============================================================ */
+
+function downloadFullBib() {
+
+  if (!bibText) return;
+
+  const blob =
+    new Blob(
+      [bibText],
+      {type: "text/plain"}
+    );
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const a =
+    document.createElement("a");
+
+  a.href = url;
+  a.download = "references.bib";
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  URL.revokeObjectURL(url);
+}
+
+
+/* ============================================================
+   DATA HELPERS
+============================================================ */
+
+function getDoiUrl(entry) {
+
+  const rawDoi =
+    findField(
+      entry.fields || {},
+      "doi"
+    ).trim();
+
+  if (!rawDoi) return "";
+
+  if (/^https?:\/\//i.test(rawDoi)) {
+    return rawDoi;
+  }
+
+  return `https://doi.org/${rawDoi}`;
+}
+
+
+function getFieldDisplayValue(
+  entry,
+  fieldName
+) {
+
+  if (fieldName === "type") {
+    return entry.type || "";
+  }
+
+  return (
+    findField(
+      entry.fields || {},
+      fieldName
+    ) || ""
+  ).replace(/\s+/g, " ");
+}
+
+
+function formatFieldValue(
+  field,
+  value
+) {
+
+  if (!value) return "—";
+
+  if (field === "keywords") {
+
+    return value
+      .split(",")
+      .map(k =>
+        `<span class="keyword">
+          ${escapeHtml(k.trim())}
+        </span>`
+      )
+      .join("");
+  }
+
+  return escapeHtml(value);
+}
+
+
+function formatFieldLabel(fieldName) {
+
+  return fieldName
+    .replace(/[_\-]+/g, " ")
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/* ============================================================
+   BIBTEX
+============================================================ */
+
+function parseBibTeX(text) {
+
+  const entries = [];
+
+  const entryRegex =
+    /@(\w+)\s*\{\s*([^,]+),([\s\S]*?)\n\}/g;
+
+  let match;
+
+  while (
+    (match = entryRegex.exec(text)) !== null
+  ) {
+
+    const type =
+      match[1].trim();
+
+    const key =
+      match[2].trim();
+
+    const body =
+      match[3];
+
+    const fields = {};
+
+    const fieldRegex =
+      /([\w\-]+)\s*=\s*\{([\s\S]*?)\}/g;
+
+    let fmatch;
+
+    while (
+      (fmatch = fieldRegex.exec(body)) !== null
+    ) {
+
+      fields[
+        fmatch[1]
+          .trim()
+          .toLowerCase()
+      ] =
+        fmatch[2].trim();
     }
 
-    function findField(fields, name) {
-      const possible = Object.keys(fields).find(k => k.toLowerCase().includes(name.toLowerCase()));
-      return possible ? fields[possible] : "";
-    }
+    entries.push({
+      type,
+      key,
+      fields
+    });
+  }
+
+  return entries;
+}
 
 
-    loadBib();
-  </script>
+function findField(fields, name) {
+
+  const possible =
+    Object.keys(fields)
+      .find(k =>
+        k.toLowerCase()
+          .includes(name.toLowerCase())
+      );
+
+  return possible
+    ? fields[possible]
+    : "";
+}
+
+
+function hydrateAvailableFields(entries) {
+
+  const discoveredFields =
+    entries.flatMap(
+      e => Object.keys(e.fields || {})
+    );
+
+  viewerConfig.availableFields =
+    mergeUnique(
+      viewerConfig.availableFields,
+      ["type", ...discoveredFields]
+    );
+
+  viewerConfig.defaultFields =
+    viewerConfig.defaultFields
+      .filter(f =>
+        viewerConfig.availableFields.includes(f)
+      );
+}
+
+
+function uniqueLowercaseArray(value) {
+
+  if (!Array.isArray(value))
+    return [];
+
+  return Array.from(
+    new Set(
+      value
+        .map(item =>
+          String(item)
+            .trim()
+            .toLowerCase()
+        )
+        .filter(Boolean)
+    )
+  );
+}
+
+
+function mergeUnique(
+  primary,
+  secondary
+) {
+
+  return Array.from(
+    new Set([
+      ...(primary || []),
+      ...(secondary || [])
+    ])
+  );
+}
+
+
+/* ============================================================
+   GLOBAL HANDLERS
+============================================================ */
+
+function bindGlobalHandlers() {
+
+  document
+    .getElementById("downloadFullBibBtn")
+    .onclick =
+      downloadFullBib;
+
+  updateSummary();
+}
+
+
+/* ============================================================
+   START
+============================================================ */
+
+loadBib();
+
+</script>
+
 </body>
 </html>
